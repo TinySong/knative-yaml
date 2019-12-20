@@ -1,0 +1,15 @@
+1. 文件所在位置:192.168.0.136:/opt/tekton/samples/blue-green 
+2. 利用tekton-blue-green.yaml 创建一个task,三个pipeline
+	task: task-blue-green - 用来部署服务
+	pipeline:
+		tekton-blue-green-1 : 用来部署blue版本 [blue 100%, green 0%]
+		tekton-blue-green-2 : 用来部署green版本,但不切换流量 [blue 100%, green 0%]
+    		tekton-blue-green-3 : 切换流量 [blue 50%, green 50%]
+3. 进入http://192.168.0.136:9097/ 页面创建pipelinerun 运行
+	namespace: default
+	pipeline: tekton-blue-green-1 或者 tekton-blue-green-2 或者 tekton-blue-green-3
+	PipelineResources : tekton-helloworld-git
+	sa : tekton-blue-green
+  创建
+4. 访问路径http://tekton-blue-green.default.example.com 查看结果
+	

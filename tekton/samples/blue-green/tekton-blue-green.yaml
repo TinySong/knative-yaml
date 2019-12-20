@@ -1,0 +1,122 @@
+apiVersion: tekton.dev/v1alpha1
+kind: Pipeline
+metadata:
+  name: tekton-blue-green-3
+spec:
+  resources:
+    - name: source-repo
+      type: git
+  tasks:
+    - name: step-1
+      taskRef:
+        name: task-blue-green
+      resources:
+        inputs:
+          - name: source
+            resource: source-repo
+      params:
+        - name: path
+          value: /workspace/source/stage3.yaml
+---
+apiVersion: tekton.dev/v1alpha1
+kind: Pipeline
+metadata:
+  name: tekton-blue-green-2
+spec:
+  resources:
+    - name: source-repo
+      type: git
+  tasks:
+    - name: step-1
+      taskRef:
+        name: task-blue-green
+      resources:
+        inputs:
+          - name: source
+            resource: source-repo
+      params:
+        - name: path
+          value: /workspace/source/stage2.yaml
+---
+apiVersion: tekton.dev/v1alpha1
+kind: Pipeline
+metadata:
+  name: tekton-blue-green-1
+spec:
+  resources:
+    - name: source-repo
+      type: git
+  tasks:
+    - name: step-1
+      taskRef:
+        name: task-blue-green
+      resources:
+        inputs:
+          - name: source
+            resource: source-repo
+      params:
+        - name: path
+          value: /workspace/source/stage1.yaml
+---
+apiVersion: tekton.dev/v1alpha1
+kind: PipelineResource
+metadata:
+  name: tekton-helloworld-git
+spec:
+  type: git
+  params:
+    - name: revision
+      value: master
+    - name: url
+      value: https://github.com/just-do1/tekton-helloworld
+---
+apiVersion: tekton.dev/v1alpha1
+kind: Task
+metadata:
+  name: task-blue-green
+spec:
+  inputs:
+    resources:
+      - name: source
+        type: git
+    params:
+      - name: path
+        type: string
+        description: Path to the manifest to apply
+  steps:
+    - name: run-kubectl
+      image: lachlanevenson/k8s-kubectl
+      command: ["kubectl"]
+      args:
+        - "apply"
+        - "-f"
+        - "$(inputs.params.path)"
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: tekton-blue-green
+
+---
+kind: ClusterRole
+apiVersion: rbac.authorization.k8s.io/v1
+metadata:
+  name: tekton-deploy-blue-green
+rules:
+- apiGroups: ["serving.knative.dev"]
+  resources: ["services"]
+  verbs: ["get", "list", "watch", "create", "update", "patch", "delete"]
+---
+kind: ClusterRoleBinding
+apiVersion: rbac.authorization.k8s.io/v1
+metadata:
+  name: tekton-deploy-rolebinding
+subjects:
+- kind: ServiceAccount
+  name: tekton-blue-green
+  namespace: default
+roleRef:
+  kind: ClusterRole #this must be Role or ClusterRole
+  name: tekton-deploy-blue-green # this must match the name of the Role or ClusterRole you wish to bind to
+  apiGroup: rbac.authorization.k8s.io
+---

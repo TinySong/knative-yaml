@@ -1,0 +1,14 @@
+apiVersion: tekton.dev/v1alpha1
+kind: Task
+metadata:
+  name: echo-hello-world
+  namespace: tekton-samples
+spec:
+  steps:
+    - name: echo
+      #image: ubuntu
+      image: busybox
+      command:
+        - echo
+      args:
+        - "hello world"

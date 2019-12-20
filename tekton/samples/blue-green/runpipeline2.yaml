@@ -1,0 +1,12 @@
+apiVersion: tekton.dev/v1alpha1
+kind: PipelineRun
+metadata:
+  name: pipelinerun-blue-green-2
+spec:
+  serviceAccountName: tekton-blue-green
+  pipelineRef:
+    name: tekton-blue-green-2
+  resources:
+    - name: source-repo
+      resourceRef:
+        name: tekton-helloworld-git

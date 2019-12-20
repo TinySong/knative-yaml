@@ -1,0 +1,21 @@
+apiVersion: tekton.dev/v1alpha1
+kind: PipelineResource
+metadata:
+  name: tekton-helloworld-git
+spec:
+  type: git
+  params:
+    - name: revision
+      value: master
+    - name: url
+      value: https://github.com/just-do1/tekton-helloworld
+---
+apiVersion: tekton.dev/v1alpha1
+kind: PipelineResource
+metadata:
+  name: tekton-helloworld-image
+spec:
+  type: image
+  params:
+    - name: url
+      value: 192.168.1.52/system_containers/tekton/helloworld:v0.1.0

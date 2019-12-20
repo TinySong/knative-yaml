@@ -1,0 +1,16 @@
+apiVersion: tekton.dev/v1alpha1
+kind: TaskRun
+metadata:
+  name: deploy-stage1
+spec:
+  serviceAccountName: tekton-blue-green
+  taskRef:
+    name: deploy-using-kubectl
+  inputs:
+    resources:
+      - name: source
+        resourceRef:
+          name: tekton-helloworld-git 
+    params:
+      - name: path
+        value: /workspace/source/stage1.yaml

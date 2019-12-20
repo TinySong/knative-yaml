@@ -1,0 +1,15 @@
+apiVersion: tekton.dev/v1alpha1
+kind: TaskRun
+metadata:
+  name: run-with-parameters
+spec:
+  taskRef:
+    name: task-with-parameters
+  inputs:
+    params:
+      - name: flags
+        value:
+          - "abc"
+          - "def"
+      - name: someURL
+        value: "https://github.com/knative-sample"
